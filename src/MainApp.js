@@ -2,10 +2,15 @@ import Reef from 'reefjs';
 
 // Import Components
 import { NavBar } from './components/NavBar.js'
+import { Uploader } from './components/Uploader.js'
 
-// Import Utils
+import { ShowComp } from './components/ShowComp.js';
+import { Scanner } from './components/Scanner.js';
 
+//Imports Utils Functions
+import { uploadFiles } from './utils/uploadFiles.js'
 import { updateComp } from './utils/updateComp.js'
+
 
 export const MainApp = function() {
 
