@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 	window.addEventListener("arweaveWalletLoaded", () => {
 	  MainApp()
-
+		
 	});
 
 

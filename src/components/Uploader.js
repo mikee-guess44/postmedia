@@ -12,7 +12,9 @@ let storeUploader = new Reef.Store({
     content: {
       tableFiles: {},
       loadText: { value: 'false'},
-      loadError: { value: 'false'}
+      loadDetails: { value: ''},
+      loadError: { value: 'false'},
+      jsonData: { value: ''}
     }
   },
   setters: {
@@ -56,7 +58,10 @@ export const Uploader = new Reef('#upload-files', {
                           ¡Connection error! Retry again..
                           </span>
                         </div>`
-    var uploaderProgress = `<progress class="progress is-small is-dark mt-2" max="100">25%</progress>`
+    var uploaderProgress = `<div class="level mt-2">
+    <span class="tag is-light mr-1">${_cnt.loadDetails.value}</span>
+    <progress class="progress is-small is-dark" max="100">25%</progress>
+    </div>`
     var selectFilesButton = `<div class="file is-small is-outlined mt-2">
       <label class="file-label">
         <input class="file-input" type="file" id="uploader" multiple>
@@ -79,6 +84,7 @@ export const Uploader = new Reef('#upload-files', {
                           </span>
                         </div>`
     var uploaderTittle = `<h1 class="title is-size-6 level-item has-text-centered">Uploader</h1>`
+
     return `<div>
               ${uploaderTittle}
               ${selectFilesButton}
@@ -87,16 +93,22 @@ export const Uploader = new Reef('#upload-files', {
 
               ${_cnt.loadText.value == 'true' ?  `${uploaderProgress}` : ''}
               ${_cnt.loadError.value == 'true' ?  `${serverError}` : ''}
-              ${_cnt.tableFiles.value ? eatFiles(_cnt.tableFiles.value) : ''}
+              ${_cnt.tableFiles.value ? eatFiles(_cnt.tableFiles.value, _cnt.jsonData.value) : ''}
             </div>`
 
   }
 })
 
-function eatFiles(files) {
+function eatFiles(files, data) {
 
   let result = ''
-  result = `<table class="table has-text-black-bis is-hoverable is-fullwidth is-size-7 mt-4">
+  result = `<div class="is-flex is-justify-content-flex-end p-0  mt-6">
+    <a class="tag is-success is-small" href="data:${data}" download="data.json" id="export-json">
+        <i class="fas fa-file-signature mr-1 has-text-dark"></i>
+        Export Json File
+    </a>
+  </div>
+  <table class="table has-text-black-bis is-hoverable is-fullwidth is-size-7 mt-2">
     <thead>
       <tr>
         <th>ID</th>
@@ -108,14 +120,14 @@ function eatFiles(files) {
     </thead>
     <tbody>
     ${Object.keys(files).map((file) => {
-
+      let imageElement = `<td><a href="${files[file].link}" target="_blank"><img src="${files[file].link}" class="image is-32x32"></a></td>`
       return `
       <tr>
         <td>${files[file].id}</td>
         <td>${files[file].name}</td>
         <td>${(files[file].size / 1000).toFixed(1)} kB</td>
         <td>${files[file].type}</td>
-        <td><img src="${files[file].link}" class="image is-32x32"></td>
+        ${files[file].type.startsWith('image') ? imageElement : ''}
       </tr>`
     }).join('\r')}
     </tbody>

@@ -1,5 +1,7 @@
 import Reef from 'reefjs';
 
+import ArDB from 'ardb';
+
 // Import Components
 import { NavBar } from './components/NavBar.js'
 import { Uploader } from './components/Uploader.js'
@@ -11,9 +13,10 @@ import { uploadFiles } from './utils/uploadFiles.js'
 import { updateComp } from './utils/updateComp.js'
 import { checkPsfree } from './utils/checkPsfree.js';
 import { checkLogin } from './utils/checkLogin.js';
+import { getTxUser } from './utils/getTxUser.js';
 import { randomInt } from './utils/randomInt.js'
 import { handleComp } from './utils/handleComp.js';
-
+import { handlePostData } from './utils/handlePostData.js'
 
 export const MainApp = function() {
 
@@ -80,11 +83,25 @@ export const MainApp = function() {
 
   updateComp(App, 'attach', [NavBar])
 
+//------------------------------------------------------
+  const arweave = Arweave.init({
+  host: 'arweave.net',// Hostname or IP address for a Arweave host
+  port: 443,          // Port
+  protocol: 'https',  // Network protocol http or https
+  timeout: 20000,     // Network request timeouts in milliseconds
+  logging: false
+});
+  let ardb = new ArDB(arweave)
+  getTxUser(ardb, 'EOyyw_WZz9mgWY2yNJt5ACAySpSDLMMWTAAVmpLd8wA').then((value) => {console.log(value)})
+
+
+//------------------------------------------------------
+
+
+
   arweaveWallet.getPermissions().then((perms) => {
 
     checkLogin(perms, NavBar.store, App, [ShowComp])
-
-
   })
 
   document.addEventListener('change', (event) => {
@@ -117,9 +134,9 @@ export const MainApp = function() {
         field: 'value',
         value: 'true'
       }])
-      uploadFiles(inputFiles).then((files) => {
+      uploadFiles(inputFiles, [{tag: 'Content-type', value: 'image/png'}], arweave).then((response) => {
 
-        if (files.error) {
+        if (!response.result) {
 
           Uploader.store.do('setStyle', {
             element: 'buttonStampFiles',
@@ -134,26 +151,31 @@ export const MainApp = function() {
             Uploader.store.do('setContent', [{ element: 'loadError', field: 'value', value: 'false'}])
           }, 4500);
         }
-        if (!files.error) {
+        if (response.result) {
 
-          for (var file of files) {
-            let items = store.get('getFiles')
-            file.id = items.length + 1
-            store.do('pushFiles', file)
-          }
+          handlePostData(arweave, [{ tag:"Content-Type", value: "image/png"}], Uploader.store).then((files) => {
 
-          let tableF = store.get('getFiles')
-          sessionStorage.setItem('files', JSON.stringify(tableF));
-          Uploader.store.do('setContent', [
-            { element: 'tableFiles', field: 'value', value: tableF },
-            { element: 'loadText', field: 'value', value: 'false' }
-          ])
-          Uploader.store.do('setStyle', {
-            element: 'buttonStampFiles',
-            style: 'loading',
-            value: 'false'
+
+            Uploader.store.do('setStyle', {
+              element: 'buttonStampFiles',
+              style: 'loading',
+              value: 'false'
+            })
+
+            for (var file of files) {
+              let items = store.get('getFiles')
+              file.id = items.length + 1
+              store.do('pushFiles', file)
+            }
+
+            let tableF = store.get('getFiles')
+            localforage.setItem('filesData', tableF)
+
+            Uploader.store.do('setContent', [
+              { element: 'tableFiles', field: 'value', value: tableF },
+              { element: 'loadText', field: 'value', value: 'false' }
+            ])
           })
-
         }
 
       })
@@ -166,7 +188,7 @@ export const MainApp = function() {
       { element: 'buttonWallet', style: 'loading', value: 'true' }
     ])
 
-    arweaveWallet.connect(['ACCESS_ADDRESS'], {name: 'PostMedia'}).then((value) => {
+    arweaveWallet.connect(['ACCESS_ADDRESS', 'SIGN_TRANSACTION'], {name: 'PostMedia'}).then((value) => {
 
       NavBar.store.do('setStyle', [
         { element: 'buttonWallet', style: 'loading', value: 'false' },
@@ -188,7 +210,15 @@ export const MainApp = function() {
     let psFree = checkPsfree(mods)
 
     if (event.target.value === 'uploader' || event.target.parentNode.value == 'uploader') {
-
+      localforage.getItem('filesData').then((value) => {
+        if (value != null) {
+          let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(value));
+          Uploader.store.do('setContent', [
+            { element: 'tableFiles', field: 'value', value: value },
+            { element: 'jsonData', field: 'value', value: data }
+          ])
+        }
+      })
       handleComp(store, mods, psFree, 'upload-files', App, [Uploader])
 
     }
@@ -198,12 +228,30 @@ export const MainApp = function() {
     }
 
   }
+  if (event.target.id == 'empty-list') {
+    localforage.clear().then(() => {
+      Uploader.store.do('setContent', [
+          { element: 'tableFiles', field: 'value', value: '' }
+      ])
+    })
+  }
   if (event.target.id == 'avatar-user') {
     NavBar.store.do('setContent', [{
       element: 'user',
       field: 'avatar',
       value: `https://avatars.dicebear.com/api/avataaars/${randomInt()}.svg`
     }])
+  }
+  if (event.target.id == 'export-json' || event.target.parentNode.id == 'export-json') {
+    localforage.getItem('filesData').then((value) => {
+      if (value != null) {
+        let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(value));
+
+        Uploader.store.do('setContent', [
+          { element: 'jsonData', field: 'value', value: data }
+        ])
+      }
+    })
   }
 
 

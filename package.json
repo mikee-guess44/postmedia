@@ -22,7 +22,9 @@
     "webpack-cli": "^4.6.0"
   },
   "dependencies": {
+    "ardb": "^1.0.8",
     "axios": "^0.21.1",
+    "idb": "^6.0.0",
     "reefjs": "^8.2.5"
   }
 }
