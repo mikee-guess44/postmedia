@@ -83,7 +83,6 @@ export const MainApp = function() {
 
   updateComp(App, 'attach', [NavBar])
 
-//------------------------------------------------------
   const arweave = Arweave.init({
   host: 'arweave.net',// Hostname or IP address for a Arweave host
   port: 443,          // Port
@@ -91,13 +90,7 @@ export const MainApp = function() {
   timeout: 20000,     // Network request timeouts in milliseconds
   logging: false
 });
-  let ardb = new ArDB(arweave)
-  getTxUser(ardb, 'EOyyw_WZz9mgWY2yNJt5ACAySpSDLMMWTAAVmpLd8wA').then((value) => {console.log(value)})
-
-
-//------------------------------------------------------
-
-
+  let ardb = new ArDB(arweave);
 
   arweaveWallet.getPermissions().then((perms) => {
 
@@ -134,7 +127,7 @@ export const MainApp = function() {
         field: 'value',
         value: 'true'
       }])
-      uploadFiles(inputFiles, [{tag: 'Content-type', value: 'image/png'}], arweave).then((response) => {
+      uploadFiles(inputFiles, arweave).then((response) => {
 
         if (!response.result) {
 
@@ -153,7 +146,7 @@ export const MainApp = function() {
         }
         if (response.result) {
 
-          handlePostData(arweave, [{ tag:"Content-Type", value: "image/png"}], Uploader.store).then((files) => {
+          handlePostData(arweave, Uploader.store).then((files) => {
 
 
             Uploader.store.do('setStyle', {
@@ -223,8 +216,42 @@ export const MainApp = function() {
 
     }
     if (event.target.value === 'scanner' || event.target.parentNode.value == 'scanner') {
+      arweaveWallet.getActiveAddress().then((address) => {
+        handleComp(store, mods, psFree, 'scanner', App, [Scanner])
+        getTxUser(ardb, address).then((value) => {
+          if (value.count > 0) {
+            Scanner.store.do('setContent', [
+              { element: 'scannerData', field: 'value', value: value.data },
+              { element: 'loadItem', field: 'value', value: false },
+              { element: 'userDetails', field: 'count', value: value.count }
 
-      handleComp(store, mods, psFree, 'scanner', App, [Scanner])
+            ])
+          }
+          if (value.count == 0) {
+            Scanner.store.do('setContent', [
+              { element: 'loadItem', field: 'value', value: false },
+              { element: 'loadError', field: 'value', value: true },
+
+            ])
+
+            setTimeout(() => {
+              Scanner.store.do('setContent', [{ element: 'loadError', field: 'value', value: false }])
+            }, 10000);
+          }
+
+        }).catch((err) => {
+
+          Scanner.store.do('setContent', [
+
+            { element: 'loadItem', field: 'value', value: false },
+            { element: 'serverError', field: 'value', value: true }
+          ])
+          setTimeout(() => {
+            Scanner.store.do('setContent', [{ element: 'serverError', field: 'value', value: false }])
+          }, 4500);
+        })
+
+      })
     }
 
   }
@@ -256,4 +283,6 @@ export const MainApp = function() {
 
 
 })
+
+
 }

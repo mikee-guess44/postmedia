@@ -26,7 +26,7 @@ let storeUploader = new Reef.Store({
 
 
 
-      for (var i = 0; i < todos.length; i++) {
+      for (let i = 0; i < todos.length; i++) {
 
        let td = props.content[todos[i].element];
        todos[i].value != '' ? td[todos[i].field] = todos[i].value : td[todos[i].field] = ''
@@ -49,20 +49,20 @@ export const Uploader = new Reef('#upload-files', {
     let _stys = props.styles;
     let _cnt = props.content;
 
-    var btnStampLoading = _stys.buttonStampFiles.loading == 'false' ? '' : 'is-loading';
-    var btnStampDisable = _stys.buttonStampFiles.disable == 'false' ? '' : 'disabled';
+    let btnStampLoading = _stys.buttonStampFiles.loading == 'false' ? '' : 'is-loading';
+    let btnStampDisable = _stys.buttonStampFiles.disable == 'false' ? '' : 'disabled';
 
-    var serverError = `<div class="level-item has-text-centered mt-4">
+    let serverError = `<div class="level-item has-text-centered mt-4">
                           <span class="notification is-light p-1 px-6 is-size-7">
                           <i class="fas fa-exclamation-triangle has-text-warning"></i>
                           ¡Connection error! Retry again..
                           </span>
                         </div>`
-    var uploaderProgress = `<div class="level mt-2">
+    let uploaderProgress = `<div class="level mt-2">
     <span class="tag is-light mr-1">${_cnt.loadDetails.value}</span>
     <progress class="progress is-small is-dark" max="100">25%</progress>
     </div>`
-    var selectFilesButton = `<div class="file is-small is-outlined mt-2">
+    let selectFilesButton = `<div class="file is-small is-outlined mt-2">
       <label class="file-label">
         <input class="file-input" type="file" id="uploader" multiple>
         <span class="file-cta">
@@ -75,7 +75,7 @@ export const Uploader = new Reef('#upload-files', {
         </span>
       </label>
     </div>`
-    var stampButton = `<div><button class="button is-primary is-outlined is-small is-fullwidth mt-2 ${btnStampLoading}" id="btn-stamp-files" ${btnStampDisable}>
+    let stampButton = `<div><button class="button is-primary is-outlined is-small is-fullwidth mt-2 ${btnStampLoading}" id="btn-stamp-files" ${btnStampDisable}>
                           <span class="icon">
                             <i class="fas fa-stamp"></i>
                           </span>
@@ -83,7 +83,7 @@ export const Uploader = new Reef('#upload-files', {
                             Stamp
                           </span>
                         </div>`
-    var uploaderTittle = `<h1 class="title is-size-6 level-item has-text-centered">Uploader</h1>`
+    let uploaderTittle = `<h1 class="title is-size-6 level-item has-text-centered">Uploader</h1>`
 
     return `<div>
               ${uploaderTittle}
@@ -120,14 +120,18 @@ function eatFiles(files, data) {
     </thead>
     <tbody>
     ${Object.keys(files).map((file) => {
-      let imageElement = `<td><a href="${files[file].link}" target="_blank"><img src="${files[file].link}" class="image is-32x32"></a></td>`
+      let image = `<td><a href="${files[file].link}" target="_blank"><img src="${files[file].link}" class="image is-24x24"></a></td>`
+      let video = `<td><a href="${files[file].link}" target="_blank"><span class="icon has-text-dark"><i class="fas fa-fw fa-lg fa-file-video"></i></span></a></td>`
+      let audio = `<td><a href="${files[file].link}" target="_blank"><span class="icon has-text-dark"><i class="fas fa-fw fa-lg fa-file-audio"></i></span></a></td>`
       return `
       <tr>
         <td>${files[file].id}</td>
         <td>${files[file].name}</td>
         <td>${(files[file].size / 1000).toFixed(1)} kB</td>
         <td>${files[file].type}</td>
-        ${files[file].type.startsWith('image') ? imageElement : ''}
+        ${files[file].type.startsWith('image') ? image : ''}
+        ${files[file].type.startsWith('video') ? video : ''}
+        ${files[file].type.startsWith('audio') ? audio : ''}
       </tr>`
     }).join('\r')}
     </tbody>

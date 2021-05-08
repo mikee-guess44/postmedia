@@ -64,13 +64,7 @@ export const NavBar = new Reef('#nav-bar', {
         <span aria-hidden="true"></span>
       </a>
     </div>`
-    let navbarLinks = `<div class="navbar-menu">
-  <div class="navbar-start">
-    <a class="navbar-item">Home</a>
-    <a class="navbar-item">Documentation</a>
-  </div>
-</div>
-                       `
+
     let dwMode = `<span class="icon is-align-self-auto">
                     <i class="fas fa-adjust has-text-dark" id="background-color"></i>
                   </span>`
@@ -94,7 +88,6 @@ export const NavBar = new Reef('#nav-bar', {
     </div>`
     let navbar = `<nav class="navbar mt-3 py-3  px-4 has-background-light is-flex is-align-items-center" role="navigation" aria-label="main navigation">
       ${navbarStart}
-      ${navbarLinks}
       ${navbarEnd}
     </nav>`
 
