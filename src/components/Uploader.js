@@ -64,7 +64,7 @@ export const Uploader = new Reef('#upload-files', {
     </div>`
     let selectFilesButton = `<div class="file is-small is-outlined mt-2">
       <label class="file-label">
-        <input class="file-input" type="file" id="uploader" multiple>
+        <input class="file-input" type="file" id="uploader" accept="image/*, audio/*, video/*" multiple>
         <span class="file-cta">
           <span class="file-icon">
             <i class="fas fa-upload"></i>
@@ -75,12 +75,12 @@ export const Uploader = new Reef('#upload-files', {
         </span>
       </label>
     </div>`
-    let stampButton = `<div><button class="button is-primary is-outlined is-small is-fullwidth mt-2 ${btnStampLoading}" id="btn-stamp-files" ${btnStampDisable}>
+    let stampButton = `<div><button class="button is-primary is-small is-fullwidth mt-2 ${btnStampLoading}" id="btn-stamp-files" ${btnStampDisable}>
                           <span class="icon">
                             <i class="fas fa-stamp"></i>
                           </span>
                           <span class="">
-                            Stamp
+                            POSTMEDIA
                           </span>
                         </div>`
     let uploaderTittle = `<h1 class="title is-size-6 level-item has-text-centered">Uploader</h1>`
@@ -136,7 +136,7 @@ function eatFiles(files, data) {
     }).join('\r')}
     </tbody>
   </table>
-  <button class="button is-small" id="empty-list">Empty List</button>`
+  <button class="button is-small is-danger" id="empty-list">Empty List</button>`
     return result
 
 }

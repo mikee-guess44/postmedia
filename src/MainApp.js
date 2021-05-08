@@ -96,7 +96,30 @@ export const MainApp = function() {
 
     checkLogin(perms, NavBar.store, App, [ShowComp])
   })
+  //-----------------------------------------------
 
+  // Get all "navbar-burger" elements
+  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+  // Check if there are any navbar burgers
+  if ($navbarBurgers.length > 0) {
+
+    // Add a click event on each of them
+    $navbarBurgers.forEach( el => {
+      el.addEventListener('click', () => {
+
+        // Get the target from the "data-target" attribute
+        const target = el.dataset.target;
+        const $target = document.getElementById(target);
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        el.classList.toggle('is-active');
+        $target.classList.toggle('is-active');
+
+      });
+    });
+  }
+  //----------------------------------------------
   document.addEventListener('change', (event) => {
     let inputFiles = document.getElementById('uploader')
 
@@ -147,27 +170,65 @@ export const MainApp = function() {
         if (response.result) {
 
           handlePostData(arweave, Uploader.store).then((files) => {
+            Scanner.store.do('setContent', [
+              { element: 'loadItem', field: 'value', value: true }
 
+            ])
+            arweaveWallet.getActiveAddress().then((address) => {
+              Uploader.store.do('setStyle', {
+                element: 'buttonStampFiles',
+                style: 'loading',
+                value: 'false'
+              })
 
-            Uploader.store.do('setStyle', {
-              element: 'buttonStampFiles',
-              style: 'loading',
-              value: 'false'
+              for (var file of files) {
+                let items = store.get('getFiles')
+                file.id = items.length + 1
+                store.do('pushFiles', file)
+              }
+
+              let tableF = store.get('getFiles')
+              localforage.setItem('filesData', tableF)
+
+              Uploader.store.do('setContent', [
+                { element: 'tableFiles', field: 'value', value: tableF },
+                { element: 'loadText', field: 'value', value: 'false' }
+              ])
+              getTxUser(ardb, address).then((value) => {
+                if (value.count > 0) {
+                  Scanner.store.do('setContent', [
+                    { element: 'scannerData', field: 'value', value: value.data },
+                    { element: 'loadItem', field: 'value', value: false },
+                    { element: 'userDetails', field: 'count', value: value.count }
+
+                  ])
+                }
+                if (value.count == 0) {
+                  Scanner.store.do('setContent', [
+                    { element: 'loadItem', field: 'value', value: false },
+                    { element: 'loadError', field: 'value', value: true },
+
+                  ])
+
+                  setTimeout(() => {
+                    Scanner.store.do('setContent', [{ element: 'loadError', field: 'value', value: false }])
+                  }, 10000);
+                }
+
+              }).catch((err) => {
+
+                Scanner.store.do('setContent', [
+
+                  { element: 'loadItem', field: 'value', value: false },
+                  { element: 'serverError', field: 'value', value: true }
+                ])
+                setTimeout(() => {
+                  Scanner.store.do('setContent', [{ element: 'serverError', field: 'value', value: false }])
+                }, 4500);
+              })
+
             })
 
-            for (var file of files) {
-              let items = store.get('getFiles')
-              file.id = items.length + 1
-              store.do('pushFiles', file)
-            }
-
-            let tableF = store.get('getFiles')
-            localforage.setItem('filesData', tableF)
-
-            Uploader.store.do('setContent', [
-              { element: 'tableFiles', field: 'value', value: tableF },
-              { element: 'loadText', field: 'value', value: 'false' }
-            ])
           })
         }
 
@@ -193,6 +254,10 @@ export const MainApp = function() {
 
 
       })
+    }).catch((err) => {
+      NavBar.store.do('setStyle', [
+        { element: 'buttonWallet', style: 'loading', value: 'false' }
+      ])
     })
 
 
@@ -272,7 +337,7 @@ export const MainApp = function() {
   if (event.target.id == 'export-json' || event.target.parentNode.id == 'export-json') {
     localforage.getItem('filesData').then((value) => {
       if (value != null) {
-        let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(value));
+        let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(value, null, 2));
 
         Uploader.store.do('setContent', [
           { element: 'jsonData', field: 'value', value: data }

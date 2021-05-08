@@ -53,38 +53,38 @@ export const NavBar = new Reef('#nav-bar', {
     let userDisplay = _cnt.user.display == 'true' ? '' : 'is-hidden';
     let userAvatar = _cnt.user.avatar;
 
-    let navbarStart = `<div class="navbar-brand has-text-white-ter	">
+    let navbarStart = `<div class="navbar-brand ml-6">
       <a class="navbar-item" href="#">
-        <img src="${window.location.origin}/src/logo.png">
+        <img src="https://arweave.net/I2774jQ1jk_fFz22js1lW1CPsiThq9y0FDfWAjd_yag">
       </a>
 
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarTarget">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
       </a>
     </div>`
-
-    let dwMode = `<span class="icon is-align-self-auto">
-                    <i class="fas fa-adjust has-text-dark" id="background-color"></i>
-                  </span>`
-    let userDetails = `<div class="navbar-start ${userDisplay}">
-    <figure class="image is-32x32">
+    let userDetails = `<div class="navbar-item ${userDisplay}">
+      <figure class="image is-32x32">
         <img src="${userAvatar}" id="avatar-user">
       </figure>
       <span class="navbar-item is-size-7">
         ${userAddress}
       </span>
     </div>`
-    let btnConnect = `<button class="button is-info is-small mr-4 ${btnWalletDisplay} ${btnWalletLoading} is-flex is-aling-items-center" id="connect-wallet">
-                        <img class="image is-24x24" src="https://raw.githubusercontent.com/th8ta/ArConnect/development/src/assets/logo.png">
-                        <span class=" ml-2">
-                          CONNECT WALLET
-                        </span>
-                      </button>`
-    let navbarEnd = `<div class="navbar-end">
+    let btnConnect = `<div class="navbar-item">
+<button class="button is-info is-small mr-4 ${btnWalletDisplay} ${btnWalletLoading} is-flex is-aling-items-center" id="connect-wallet">
+<img class="image is-24x24" src="https://raw.githubusercontent.com/th8ta/ArConnect/development/src/assets/logo.png">
+<span class=" ml-2">
+CONNECT WALLET
+</span>
+</button>
+</div>`
+    let navbarEnd = `<div class="navbar-menu" id="navbarTarget" >
+    <div class="navbar-end">
     ${userDetails}
     ${btnConnect}
+    </div>
     </div>`
     let navbar = `<nav class="navbar mt-3 py-3  px-4 has-background-light is-flex is-align-items-center" role="navigation" aria-label="main navigation">
       ${navbarStart}
