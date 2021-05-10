@@ -7,7 +7,7 @@ import { NavBar } from './components/NavBar.js'
 import { Uploader } from './components/Uploader.js'
 import { ShowComp } from './components/ShowComp.js'
 import { Scanner } from './components/Scanner.js'
-
+import { installArconnect } from "./installArconnect.js";
 //Imports Utils Functions
 import { uploadFiles } from './utils/uploadFiles.js'
 import { updateComp } from './utils/updateComp.js'
@@ -91,7 +91,7 @@ export const MainApp = function() {
   logging: false
 });
   let ardb = new ArDB(arweave);
-
+  installArconnect.store.do('setTitle', '')
   arweaveWallet.getPermissions().then((perms) => {
 
     checkLogin(perms, NavBar.store, App, [ShowComp])
