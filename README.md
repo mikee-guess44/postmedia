@@ -1,5 +1,8 @@
 # PostMedia
 
+App URL:
+https://arweave.net/YY-vw5PjRhRmoejt_UzRDYkuaZVRy6NuN3o0SjPsD9E
+
 This App allows users to store files in the Arweave block chain, in an easy and fast way.
 It consists of two modules, the Uploader and the Scanner
 
